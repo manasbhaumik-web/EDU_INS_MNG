@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,750;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", "Lora", Georgia, serif;
+  --font-serif: "Lora", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Academic Heritage: Luxury Deep Rose/Burgundy Wine Claret spectrum */
+  --color-indigo-50: #fdf5f6;     /* Rose blush cream */
+  --color-indigo-100: #fbeaed;    /* Soft claret cream */
+  --color-indigo-200: #f7d5da;    /* Muted plaster rose */
+  --color-indigo-300: #eea1ac;    /* Antique dusty rose */
+  --color-indigo-400: #e06d7d;    /* Old school carmine */
+  --color-indigo-500: #be3246;    /* Crimson cherry */
+  --color-indigo-600: #881337;    /* Core burgundy claret (Main action dye) */
+  --color-indigo-750: #700d2b;    /* Rich claret */
+  --color-indigo-700: #700d2b;    /* Rich claret */
+  --color-indigo-800: #5a041c;    /* Deep oxford burgundy */
+  --color-indigo-900: #400111;    /* Obsidian wine claret */
+}
+
+/* Custom fade in animation and clean scrollbars */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom scrollbar hider */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ultra-density technical table optimizations */
+table {
+  font-size: 11px;
+}
+th {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+td {
+  font-family: var(--font-sans);
+}
+.font-mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
