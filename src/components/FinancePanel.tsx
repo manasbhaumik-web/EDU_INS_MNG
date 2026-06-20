@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Invoice, Expense, Department, Role } from '../types';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { DollarSign, FileText, PieChart, TrendingUp, Check, X, PlusCircle, AlertCircle } from 'lucide-react';
+import { DollarSign, FileText, PieChart, TrendingUp, Check, X, PlusCircle, AlertCircle, Calendar } from 'lucide-react';
 
 interface FinancePanelProps {
   currentUserRole: Role;
@@ -30,6 +30,11 @@ export default function FinancePanel({
   onLogAction,
 }: FinancePanelProps) {
   const [activeTab, setActiveTab] = useState<'fees' | 'budget' | 'expenses'>('fees');
+
+  // Academic quarter & date range filter state
+  const [timeframe, setTimeframe] = useState<'all' | 'Q1' | 'Q2' | 'Q3' | 'Q4' | 'custom'>('all');
+  const [customStart, setCustomStart] = useState('2026-01-01');
+  const [customEnd, setCustomEnd] = useState('2026-12-31');
 
   // Invoice creation form state
   const [studentName, setStudentName] = useState('');
@@ -98,18 +103,55 @@ export default function FinancePanel({
     );
   }
 
-  // Calculate Metrics
-  const totalInvoiced = invoices.reduce((sum, item) => sum + item.amount, 0);
-  const paidInvoiced = invoices.filter(item => item.status === 'Paid').reduce((sum, item) => sum + item.amount, 0);
-  const unpaidInvoiced = invoices.filter(item => item.status === 'Unpaid').reduce((sum, item) => sum + item.amount, 0);
+  // Calculate timeframe bounds
+  const getLimits = () => {
+    switch (timeframe) {
+      case 'Q1':
+        return { start: '2026-01-01', end: '2026-03-31' };
+      case 'Q2':
+        return { start: '2026-04-01', end: '2026-06-30' };
+      case 'Q3':
+        return { start: '2026-07-01', end: '2026-09-30' };
+      case 'Q4':
+        return { start: '2026-10-01', end: '2026-12-31' };
+      case 'custom':
+        return { start: customStart, end: customEnd };
+      default:
+        return { start: '1970-01-01', end: '2099-12-31' };
+    }
+  };
 
-  // Departmental Budget structures for chart
-  const budgetChartData = departments.map((dept) => ({
-    name: dept.code,
-    fullName: dept.name,
-    Allocated: dept.budget,
-    Expended: dept.spent,
-  }));
+  const limits = getLimits();
+
+  // Filter lists based on timeframe bounds
+  const filteredInvoices = invoices.filter(item => {
+    const dateOnly = item.dateCreated.split(' ')[0];
+    return dateOnly >= limits.start && dateOnly <= limits.end;
+  });
+
+  const filteredExpenses = expenses.filter(item => {
+    const dateOnly = item.date.split(' ')[0];
+    return dateOnly >= limits.start && dateOnly <= limits.end;
+  });
+
+  // Calculate Metrics recursively based on timeframe filter
+  const totalInvoiced = filteredInvoices.reduce((sum, item) => sum + item.amount, 0);
+  const paidInvoiced = filteredInvoices.filter(item => item.status === 'Paid').reduce((sum, item) => sum + item.amount, 0);
+  const unpaidInvoiced = filteredInvoices.filter(item => item.status === 'Unpaid').reduce((sum, item) => sum + item.amount, 0);
+
+  // Departmental Budget structures for chart (Expended represents dynamic spent matching the filtered timeframe)
+  const budgetChartData = departments.map((dept) => {
+    const dynamicSpent = filteredExpenses
+      .filter(exp => exp.departmentId === dept.id && exp.status === 'Approved')
+      .reduce((sum, exp) => sum + exp.amount, 0);
+
+    return {
+      name: dept.code,
+      fullName: dept.name,
+      Allocated: dept.budget,
+      Expended: timeframe === 'all' ? dept.spent : dynamicSpent,
+    };
+  });
 
   return (
     <div className="bg-white rounded-none border border-slate-200 shadow-none overflow-hidden animate-fade-in">
@@ -153,6 +195,76 @@ export default function FinancePanel({
       </div>
 
       <div className="p-6">
+        {/* Dynamic Academic Quarter & Date Range Picker Toolbar */}
+        <div className="mb-6 bg-slate-50 border border-slate-200 p-4 font-sans text-xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="bg-indigo-50 border border-indigo-200 p-1.5 text-indigo-600 rounded-none shrink-0 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 uppercase tracking-wider text-[10px] font-display">Academic Quarter Timeframe Filter</p>
+                <p className="text-[9px] text-slate-400 uppercase tracking-wide font-semibold">Segment logs, invoices, and expense claims dynamically.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1">
+              {(['all', 'Q1', 'Q2', 'Q3', 'Q4', 'custom'] as const).map((q) => {
+                const label = q === 'all' ? 'All Quarters' : q === 'custom' ? 'Custom Range' : `${q} 2026`;
+                return (
+                  <button
+                    key={q}
+                    onClick={() => setTimeframe(q)}
+                    className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider border rounded-none transition cursor-pointer ${
+                      timeframe === q
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
+                        : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Custom Date Picker Inputs - rendered only if custom is selected */}
+          {timeframe === 'custom' && (
+            <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
+              <div>
+                <label className="block text-[8px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Custom Start Date</label>
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className="w-full border border-slate-200 rounded-none p-2 bg-white text-xs outline-none focus:border-indigo-600 font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Custom End Date</label>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className="w-full border border-slate-200 rounded-none p-2 bg-white text-xs outline-none focus:border-indigo-600 font-mono"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Current range info preview */}
+          <div className="mt-3 text-[9px] text-slate-400 font-extrabold uppercase tracking-wide flex flex-col sm:flex-row sm:items-center gap-1.5 bg-white p-2.5 border border-slate-200/60">
+            <span>Active Ledger Window:</span>
+            <span className="text-indigo-600 font-mono text-[9.5px]">
+              {limits.start === '1970-01-01' ? 'unrestricted history' : `${limits.start} to ${limits.end}`}
+            </span>
+            <span className="hidden sm:inline text-slate-300 mx-1">|</span>
+            <span className="inline-flex gap-1">
+              Matched: <strong className="text-slate-900 font-mono">{filteredInvoices.length}</strong> Invoices, <strong className="text-slate-900 font-mono">{filteredExpenses.length}</strong> Expenses
+            </span>
+          </div>
+        </div>
+
         {/* TAB 1: FEES & INVOICES */}
         {activeTab === 'fees' && (
           <div className="space-y-6">
@@ -175,7 +287,7 @@ export default function FinancePanel({
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Left Column: Create Invoice (Authorized Roles) */}
               {hasFullAccess || isClerk ? (
-                <div className="w-full lg:w-1/3 bg-slate-50 p-5 rounded-none border border-slate-205 text-xs text-slate-700">
+                <div className="w-full lg:w-1/3 bg-slate-50 p-5 rounded-none border border-slate-205 text-xs text-slate-705">
                   <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-1 font-display uppercase tracking-wider text-[10px] border-b border-slate-200 pb-2">
                     <PlusCircle className="w-3.5 h-3.5 text-indigo-650" /> Generate Student Invoice
                   </h3>
@@ -254,7 +366,7 @@ export default function FinancePanel({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-755">
-                    {invoices.map((inv) => (
+                    {filteredInvoices.map((inv) => (
                       <tr key={inv.id} className="hover:bg-slate-50/50 transition duration-150">
                         <td className="p-3.5 font-mono text-[10px] font-semibold text-slate-450">{inv.id}</td>
                         <td className="p-3.5 font-bold text-slate-900">{inv.studentName}</td>
@@ -270,6 +382,13 @@ export default function FinancePanel({
                         </td>
                       </tr>
                     ))}
+                    {filteredInvoices.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-400 font-bold uppercase tracking-wider text-[9px] bg-slate-50/50">
+                          No invoices found matches the selected timeframe.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -304,7 +423,9 @@ export default function FinancePanel({
               <div className="space-y-3.5 text-xs">
                 <h4 className="font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider text-[9px] font-display border-b border-slate-200 pb-2"><AlertCircle className="w-3.5 h-3.5 text-indigo-600" /> Departmental Reserves</h4>
                 {departments.map((dept) => {
-                  const percentUsed = Math.min(100, Math.round((dept.spent / dept.budget) * 100));
+                  const dataForDept = budgetChartData.find(d => d.name === dept.code);
+                  const dynamicExpended = dataForDept ? dataForDept.Expended : dept.spent;
+                  const percentUsed = Math.min(100, Math.round((dynamicExpended / dept.budget) * 100));
                   return (
                     <div key={dept.id} className="bg-white p-3.5 rounded-none border border-slate-200 space-y-1.5">
                       <div className="flex justify-between items-center">
@@ -319,7 +440,7 @@ export default function FinancePanel({
                       </div>
                       <div className="flex justify-between font-mono text-[9px] text-slate-450 pt-0.5">
                         <span>B: ${dept.budget.toLocaleString()}</span>
-                        <span>S: ${dept.spent.toLocaleString()}</span>
+                        <span>S: ${dynamicExpended.toLocaleString()}</span>
                       </div>
                     </div>
                   );
@@ -398,7 +519,7 @@ export default function FinancePanel({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-700">
-                    {expenses.map((exp) => {
+                    {filteredExpenses.map((exp) => {
                       const deptCode = departments.find(d => d.id === exp.departmentId)?.code || 'N/A';
                       return (
                         <tr key={exp.id} className="hover:bg-slate-50/50 transition duration-150">
@@ -447,6 +568,13 @@ export default function FinancePanel({
                         </tr>
                       );
                     })}
+                    {filteredExpenses.length === 0 && (
+                      <tr>
+                        <td colSpan={hasFullAccess ? 7 : 6} className="p-8 text-center text-slate-400 font-bold uppercase tracking-wider text-[9px] bg-slate-50/50">
+                          No expenses found matches the selected timeframe.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

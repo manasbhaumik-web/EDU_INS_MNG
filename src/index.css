@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,750;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -7,18 +7,19 @@
   --font-serif: "Lora", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  /* Academic Heritage: Luxury Deep Rose/Burgundy Wine Claret spectrum */
-  --color-indigo-50: #fdf5f6;     /* Rose blush cream */
-  --color-indigo-100: #fbeaed;    /* Soft claret cream */
-  --color-indigo-200: #f7d5da;    /* Muted plaster rose */
-  --color-indigo-300: #eea1ac;    /* Antique dusty rose */
-  --color-indigo-400: #e06d7d;    /* Old school carmine */
-  --color-indigo-500: #be3246;    /* Crimson cherry */
-  --color-indigo-600: #881337;    /* Core burgundy claret (Main action dye) */
-  --color-indigo-750: #700d2b;    /* Rich claret */
-  --color-indigo-700: #700d2b;    /* Rich claret */
-  --color-indigo-800: #5a041c;    /* Deep oxford burgundy */
-  --color-indigo-900: #400111;    /* Obsidian wine claret */
+  /* Oxford Library & Gold: Academic Parchment Creams, Oxford Blue, and Premium Gold Leaves */
+  --color-indigo-50: #faf8f5;     /* Warm academic ivory/parchment background */
+  --color-indigo-100: #f4ebd4;    /* Gold cream ledger tone */
+  --color-indigo-200: #e7cca1;    /* Burnished brass overlay */
+  --color-indigo-300: #dbaf6d;    /* Classical gold foil accent */
+  --color-indigo-400: #c1934c;    /* Rich ochre library gold */
+  --color-indigo-500: #1c3561;    /* Bright imperial heraldry blue */
+  --color-indigo-600: #0a1e3f;    /* Core Oxford Library Deep Navy (Main action dye) */
+  --color-indigo-650: #081630;    /* Traditional library accent navy */
+  --color-indigo-750: #041026;    /* Velvet midnight shadow */
+  --color-indigo-700: #05142d;    /* Deepest regal navy */
+  --color-indigo-800: #020b1a;    /* Preserved parchment ink */
+  --color-indigo-900: #010611;    /* Obsidian navy slate */
 }
 
 /* Custom fade in animation and clean scrollbars */

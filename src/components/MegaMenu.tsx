@@ -72,16 +72,18 @@ export default function MegaMenu({
     }
   };
 
-  // Configuration for top-level navigation categories and their sub-menus
+  // Predefined Top Level Single Word Categories
   const navCategories = [
     {
       name: 'Dashboard',
-      icon: <Briefcase className="w-4 h-4" />,
+      icon: <Briefcase className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=300&auto=format&fit=crop',
       directLink: 'Dashboard',
     },
     {
       name: 'Academics',
-      icon: <BookOpen className="w-4 h-4" />,
+      icon: <BookOpen className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Courses & Syllabus',
@@ -104,7 +106,8 @@ export default function MegaMenu({
     },
     {
       name: 'Admissions',
-      icon: <ClipboardList className="w-4 h-4" />,
+      icon: <ClipboardList className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Intake Bureau',
@@ -118,7 +121,8 @@ export default function MegaMenu({
     },
     {
       name: 'Students',
-      icon: <GraduationCap className="w-4 h-4" />,
+      icon: <GraduationCap className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Student Profiles',
@@ -138,8 +142,9 @@ export default function MegaMenu({
       ]
     },
     {
-      name: 'Staff & HR',
-      icon: <Users className="w-4 h-4" />,
+      name: 'Staff',
+      icon: <Users className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Staff Management',
@@ -160,7 +165,8 @@ export default function MegaMenu({
     },
     {
       name: 'Finance',
-      icon: <DollarSign className="w-4 h-4" />,
+      icon: <DollarSign className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Fee administration',
@@ -180,7 +186,8 @@ export default function MegaMenu({
     },
     {
       name: 'Operations',
-      icon: <Building2 className="w-4 h-4" />,
+      icon: <Building2 className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Facilities assets',
@@ -200,7 +207,8 @@ export default function MegaMenu({
     },
     {
       name: 'Library',
-      icon: <Library className="w-4 h-4" />,
+      icon: <Library className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Circulation & catalog',
@@ -214,7 +222,8 @@ export default function MegaMenu({
     },
     {
       name: 'Administration',
-      icon: <Shield className="w-4 h-4" />,
+      icon: <Shield className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Configurations & Registry',
@@ -234,7 +243,8 @@ export default function MegaMenu({
     },
     {
       name: 'Reports',
-      icon: <TrendingUp className="w-4 h-4" />,
+      icon: <TrendingUp className="w-3.5 h-3.5" />,
+      imageIcon: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=300&auto=format&fit=crop',
       subsections: [
         {
           title: 'Consolidated Records Audits',
@@ -250,7 +260,7 @@ export default function MegaMenu({
   return (
     <nav ref={navRef} className="relative bg-white border-b border-slate-200 text-slate-800 z-30 font-sans shadow-none select-none">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex items-center h-12 gap-1 md:gap-2 overflow-visible">
+        <div className="flex items-center min-h-14 gap-1 md:gap-1.5 overflow-visible py-1 flex-wrap md:flex-nowrap">
           {navCategories.filter((cat) => {
             if (cat.directLink !== undefined) return true;
             if (!cat.subsections) return false;
@@ -263,79 +273,116 @@ export default function MegaMenu({
             const isClicked = clickedItem === cat.name;
             const isDropdownOpen = isHovered || isClicked;
 
+            const isCurrentActive =
+              activeModule === cat.name ||
+              (cat.name === 'Staff' && activeModule === 'Staff & HR') ||
+              (cat.directLink && activeModule === cat.directLink);
+
             return (
               <div
                 key={cat.name}
-                className="relative inline-block h-full group"
+                className="relative inline-block h-full shrink-0 group"
                 onMouseEnter={() => !isDirect && setHoveredItem(cat.name)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                {/* Main Link/Header */}
+                {/* Main Link/Header Button */}
                 <button
+                  type="button"
                   onClick={() => {
                     if (isDirect) {
                       onSelectModule(cat.directLink!);
                       setClickedItem(null);
                       setHoveredItem(null);
                     } else {
-                      // Toggle the dropdown state for clicks (essential for click-to-open or mobile touch)
                       setClickedItem(isClicked ? null : cat.name);
                     }
                   }}
-                  className={`flex items-center gap-1.5 px-3 h-full text-[11px] font-bold uppercase tracking-wider transition relative focus:outline-none border-b-2 cursor-pointer ${
-                    activeModule === cat.name || (cat.directLink && activeModule === cat.directLink)
+                  className={`flex items-center gap-2 px-2.5 h-12 text-[10px] font-bold uppercase tracking-wider transition relative focus:outline-none border-b-2 cursor-pointer ${
+                    isCurrentActive
                       ? 'border-indigo-600 text-indigo-600'
                       : 'border-transparent text-slate-500 hover:text-slate-900 group-hover:text-indigo-600'
                   }`}
                 >
-                  {cat.icon}
+                  {/* Reverted back to previous rectangular/square high-quality visual style with subtle border */}
+                  <img
+                    src={cat.imageIcon}
+                    alt={cat.name}
+                    referrerPolicy="no-referrer"
+                    className="w-4 h-4 rounded-none border border-slate-200 object-cover shrink-0 grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
                   <span>{cat.name}</span>
-                  {!isDirect && <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />}
+                  {!isDirect && <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-indigo-650 transition-colors" />}
                 </button>
 
-                {/* MEGA MENU DROPDOWN PANEL */}
-                {!isDirect && cat.subsections && (
-                  <div className={`absolute left-0 top-12 bg-white rounded-none shadow-lg border border-slate-200 p-6 z-50 min-w-[340px] max-w-lg lg:min-w-[420px] transition-all duration-150 origin-top-left ${
-                    isDropdownOpen
-                      ? 'opacity-100 pointer-events-auto scale-100 flex'
-                      : 'opacity-0 pointer-events-none scale-95 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:scale-100 flex'
-                  }`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full text-left">
-                      {cat.subsections.map((sub, idx) => {
-                        const visibleLinks = sub.links.filter(link =>
-                          isLinkVisible(link.roleTag, currentUserRole)
-                        );
-                        if (visibleLinks.length === 0) return null;
+                {/* MEGA MENU DROPDOWN PANEL - positioned absolutely below parent element using top-full to eliminate hover gap */}
+                {!isDirect && cat.subsections && isDropdownOpen && (
+                  <div className="absolute left-0 top-full bg-white rounded-none shadow-xl border border-slate-200 p-6 z-50 min-w-[500px] max-w-2xl lg:min-w-[620px] transition-all duration-150 origin-top-left flex">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
+                      
+                      {/* Left side panel: thematic imagery card representation of the menu module */}
+                      <div className="bg-indigo-50/50 p-4 border border-indigo-100 flex flex-col justify-between">
+                        <div>
+                          <span className="text-[8px] bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-none font-bold uppercase tracking-wider">
+                            Oxford Hub
+                          </span>
+                          <h4 className="text-xs font-display font-bold text-slate-900 uppercase tracking-tight mt-1.5 leading-tight">
+                            {cat.name} System
+                          </h4>
+                          <p className="text-[10px] text-slate-500 leading-normal mt-1.5 font-sans">
+                            Operational registry maps, access logs, and core statutory clearances.
+                          </p>
+                        </div>
+                        <div className="mt-4 relative overflow-hidden h-24 border border-indigo-200">
+                          <img
+                            src={cat.imageIcon}
+                            alt={cat.name}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 transition duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+                        </div>
+                      </div>
 
-                        return (
-                          <div key={idx} className="space-y-2.5">
-                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] border-b border-slate-100 pb-1">
-                              {sub.title}
-                            </h4>
-                            <ul className="space-y-1.5 text-xs">
-                              {visibleLinks.map((link, j) => (
-                                <li key={j}>
-                                  <button
-                                    onClick={() => {
-                                      onSelectModule(link.targetModule);
-                                      setClickedItem(null);
-                                      setHoveredItem(null);
-                                    }}
-                                    className="w-full text-left py-1 text-slate-600 hover:text-indigo-600 transition flex items-center justify-between font-bold uppercase tracking-wider text-[10px]"
-                                  >
-                                    <span>{link.label}</span>
-                                    {link.roleTag !== 'All' && (
-                                      <span className="text-[8px] bg-slate-100 text-slate-500 px-1 py-0.5 rounded-sm font-bold border border-slate-200 group-hover:bg-slate-200">
-                                        {link.roleTag}
-                                      </span>
-                                    )}
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        );
-                      })}
+                      {/* Right side subsections columns */}
+                      <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {cat.subsections.map((sub, idx) => {
+                          const visibleLinks = sub.links.filter(link =>
+                            isLinkVisible(link.roleTag, currentUserRole)
+                          );
+                          if (visibleLinks.length === 0) return null;
+
+                          return (
+                            <div key={idx} className="space-y-2">
+                              <h4 className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.12em] border-b border-indigo-100 pb-1">
+                                {sub.title}
+                              </h4>
+                              <ul className="space-y-1">
+                                {visibleLinks.map((link, j) => (
+                                  <li key={j}>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        onSelectModule(link.targetModule);
+                                        setClickedItem(null);
+                                        setHoveredItem(null);
+                                      }}
+                                      className="w-full text-left py-1 text-slate-600 hover:text-indigo-650 transition flex items-center justify-between font-bold uppercase tracking-wider text-[9px] cursor-pointer"
+                                    >
+                                      <span>{link.label}</span>
+                                      {link.roleTag !== 'All' && (
+                                        <span className="text-[7.5px] bg-indigo-50 text-indigo-700 px-1 py-0.5 font-bold border border-indigo-150">
+                                          {link.roleTag}
+                                        </span>
+                                      )}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          );
+                        })}
+                      </div>
+
                     </div>
                   </div>
                 )}

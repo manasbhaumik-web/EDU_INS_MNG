@@ -35,10 +35,16 @@ import LibraryPanel from './components/LibraryPanel';
 import CompliancePanel from './components/CompliancePanel';
 import ReportsPanel from './components/ReportsPanel';
 import SearchHub from './components/SearchHub';
+import LoginPortal from './components/LoginPortal';
 
 import { Shield, Sparkles, LogOut, Terminal, Users, Cpu, FileCheck } from 'lucide-react';
 
 export default function App() {
+  // Authentication & Session state
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem('edu_is_logged_in') === 'true';
+  });
+
   // Current active impersonation Role
   const [currentUserRole, setCurrentUserRole] = useState<Role>(() => {
     return (localStorage.getItem('edu_role') as Role) || 'Super Admin';
@@ -452,6 +458,30 @@ export default function App() {
     );
   };
 
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUserRole(user.role);
+    setIsLoggedIn(true);
+    localStorage.setItem('edu_is_logged_in', 'true');
+    localStorage.setItem('edu_role', user.role);
+    handleLogAction('Session Authentication Gate Passed', 'Authentication', `Authorized login for ${user.name} (${user.role})`);
+    setActiveModule('Dashboard');
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem('edu_is_logged_in');
+    handleLogAction('Session Logged Out', 'Authentication', 'Returned to secure check-in portal');
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <LoginPortal
+        initialUsers={initialUsers}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans transition">
       
@@ -524,6 +554,16 @@ export default function App() {
               </div>
             </div>
 
+            {/* SECURE LOGOUT SESSION ACTION */}
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-700 font-bold rounded-none transition flex items-center gap-1.5 cursor-pointer uppercase tracking-wider text-[9px]"
+              title="Secure Logout Session"
+            >
+              <LogOut className="w-3.5 h-3.5 text-slate-500" />
+              <span>Sign Out</span>
+            </button>
+
             <button
               onClick={() => {
                 const cleared = confirm('Confirm core simulated system exit? This will wipe your localStorage state demo.');
@@ -532,10 +572,10 @@ export default function App() {
                   window.location.reload();
                 }
               }}
-              className="p-2 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-700 font-bold rounded-none transition"
-              title="Factory Reset State"
+              className="p-2 border border-dashed border-red-200 hover:bg-red-50 hover:border-red-400 text-red-600 font-bold rounded-none transition cursor-pointer"
+              title="Factory Reset Database State"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <span className="text-[10px] uppercase font-mono tracking-wider font-extrabold px-1">Reset State</span>
             </button>
           </div>
         </div>
@@ -841,6 +881,8 @@ export default function App() {
             students={students}
             departments={departments}
             invoices={invoices}
+            expenses={expenses}
+            auditLogs={auditLogs}
           />
         )}
 
